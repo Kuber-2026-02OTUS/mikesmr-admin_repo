@@ -1,0 +1,8 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: homework
+  labels:
+    name: homework
+  annotations:
+    description: "Namespace for homework tasks"
