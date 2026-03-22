@@ -1,0 +1,66 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: web-server-deployment
+  namespace: homework
+spec:
+  replicas: 3
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+  selector:
+    matchLabels:
+      app: web-server
+  template:
+    metadata:
+      labels:
+        app: web-server
+    spec:
+      volumes:
+      - name: shared-volume
+        emptyDir: {}
+      
+      initContainers:
+      - name: init-downloader
+        image: busybox:latest
+        command:
+        - sh
+        - -c
+        - |
+          wget -O /init/index.html https://example.com 2>/dev/null || echo "<html><body><h1>Hello from homework</h1></body></html>" > /init/index.html
+          echo "File created successfully"
+          ls -la /init/
+        volumeMounts:
+        - name: shared-volume
+          mountPath: /init
+      
+      containers:
+      - name: web-server
+        image: nginx:alpine
+        volumeMounts:
+        - name: shared-volume
+          mountPath: /homework
+        lifecycle:
+          preStop:
+            exec:
+              command:
+              - sh
+              - -c
+              - rm -f /homework/index.html
+        ports:
+        - containerPort: 8000
+          protocol: TCP
+        readinessProbe:
+          exec:
+            command:
+            - sh
+            - -c
+            - test -f /homework/index.html
+          initialDelaySeconds: 5
+          periodSeconds: 10
+      
+      nodeSelector:
+        homework: "true"
+      
+      restartPolicy: Always
