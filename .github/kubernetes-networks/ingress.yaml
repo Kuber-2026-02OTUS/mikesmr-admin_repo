@@ -29,7 +29,7 @@ spec:
       
       # Второе правило: все остальные запросы (например, /index.html) идут напрямую
       - path: /(.*)
-        pathType: Prefix
+        pathType: ImplementationSpecific
         backend:
           service:
             name: web-server-service
