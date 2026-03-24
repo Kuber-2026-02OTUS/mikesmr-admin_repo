@@ -20,7 +20,7 @@ spec:
         # /homepage/         -> $2 = "" 
         # /homepage/test     -> $2 = "test"
         # После rewrite-target: / + $2 -> фактически путь будет / (или /test)
-        pathType: Prefix
+        pathType: ImplementationSpecific
         backend:
           service:
             name: web-server-service  # Имя сервиса из service.yaml
