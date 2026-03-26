@@ -59,11 +59,9 @@ spec:
         - containerPort: 8000  # Порт, который слушает контейнер
           protocol: TCP
         readinessProbe:  # Проверка готовности принимать трафик
-          exec:
-            command:
-            - sh
-            - -c
-            - test -f /homework/index.html  # Проверяем существование файла
+          httpGet:
+            path: /homework/index.html
+            port: 8000
           initialDelaySeconds: 5  # Ждем 5 сек после старта перед первой проверкой
           periodSeconds: 10  # Проверяем каждые 10 сек
       
