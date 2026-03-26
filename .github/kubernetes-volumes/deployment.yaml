@@ -19,7 +19,11 @@ spec:
     spec:
       volumes:  # Определение томов хранения
       - name: shared-volume  # Имя тома
-        emptyDir: {}  # Временный том (очищается при удалении пода)
+        persistentVolumeClaim:  # Используем PVC вместо emptyDir
+          claimName: homework-pvc  # Имя ранее созданного PVC
+      - name: config-volume  # Том для ConfigMap
+        configMap:
+          name: homework-config  # Имя ConfigMap
       
       initContainers:  # Контейнеры, запускаемые перед основными
       - name: init-downloader
@@ -39,8 +43,10 @@ spec:
       - name: web-server
         image: nginx:alpine  # Образ с веб-сервером
         volumeMounts:
-        - name: shared-volume
+        - name: shared-volume  # Монтируем PVC
           mountPath: /homework  # Монтируем том в директорию веб-сервера
+        - name: config-volume  # Монтируем ConfigMap
+          mountPath: /homework/conf  # Монтируем в поддиректорию conf
         resources:
           requests:
             memory: "64Mi"
@@ -69,4 +75,3 @@ spec:
         homework: "true"  # Поды запускаются только на узлах с меткой homework=true
       
       restartPolicy: Always  # Всегда перезапускать контейнеры при падении
-        # В секции initContainers и containers deployment.yaml добавьте аналогичные resources
