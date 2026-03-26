@@ -1,0 +1,72 @@
+apiVersion: apps/v1  # API версия для Deployment
+kind: Deployment  # Тип ресурса - контроллер развертывания
+metadata:
+  name: web-server-deployment  # Имя Deployment
+  namespace: homework  # В каком namespace создать
+spec:
+  replicas: 3  # Количество запускаемых экземпляров подов
+  strategy:  # Стратегия обновления
+    type: RollingUpdate  # Постепенная замена подов (без простоя)
+    rollingUpdate:
+      maxUnavailable: 1  # Максимум 1 под может быть недоступен во время обновления
+  selector:  # Как Deployment определяет свои поды
+    matchLabels:
+      app: web-server  # Поды с этой меткой принадлежат Deployment
+  template:  # Шаблон для создания подов
+    metadata:
+      labels:
+        app: web-server  # Метка, которую получают поды
+    spec:
+      volumes:  # Определение томов хранения
+      - name: shared-volume  # Имя тома
+        emptyDir: {}  # Временный том (очищается при удалении пода)
+      
+      initContainers:  # Контейнеры, запускаемые перед основными
+      - name: init-downloader
+        image: busybox:latest  # Легковесный образ с утилитами
+        command:  # Команда для генерации index.html
+        - sh
+        - -c
+        - |
+          wget -O /init/index.html https://example.com 2>/dev/null || echo "<html><body><h1>Hello from homework</h1></body></html>" > /init/index.html
+          echo "File created successfully"
+          ls -la /init/
+        volumeMounts:  # Монтирование тома в контейнер
+        - name: shared-volume  # Какой том монтируем
+          mountPath: /init  # Куда монтируем
+      
+      containers:  # Основные контейнеры
+      - name: web-server
+        image: nginx:alpine  # Образ с веб-сервером
+        volumeMounts:
+        - name: shared-volume
+          mountPath: /homework  # Монтируем том в директорию веб-сервера
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: "50m"
+          limits:
+            memory: "128Mi"
+            cpu: "100m"
+        lifecycle:  # Хуки жизненного цикла контейнера
+          preStop:  # Команда перед остановкой контейнера
+            exec:
+              command:
+              - sh
+              - -c
+              - rm -f /homework/index.html  # Удаляем файл при завершении
+        ports:
+        - containerPort: 8000  # Порт, который слушает контейнер
+          protocol: TCP
+        readinessProbe:  # Проверка готовности принимать трафик
+          httpGet:
+            path: /homework/index.html
+            port: 8000
+          initialDelaySeconds: 5  # Ждем 5 сек после старта перед первой проверкой
+          periodSeconds: 10  # Проверяем каждые 10 сек
+      
+      nodeSelector:  # Фильтр узлов для запуска подов
+        homework: "true"  # Поды запускаются только на узлах с меткой homework=true
+      
+      restartPolicy: Always  # Всегда перезапускать контейнеры при падении
+        # В секции initContainers и containers deployment.yaml добавьте аналогичные resources
