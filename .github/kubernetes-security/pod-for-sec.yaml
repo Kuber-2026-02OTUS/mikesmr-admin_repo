@@ -1,0 +1,51 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: web-server
+  namespace: homework
+spec:
+  # Используем ранее созданный сервис-аккаунт "monitoring",
+  # который имеет доступ к эндпоинту /metrics API-сервера.
+  serviceAccountName: monitoring
+  
+  # Общий том для обмена данными между init-контейнером и основным контейнером
+  volumes:
+  - name: shared-volume
+    emptyDir: {}   # временное хранилище, существует пока жив под
+  
+  # Init-контейнер загружает или создаёт файл index.html
+  initContainers:
+  - name: init-downloader
+    image: busybox:latest
+    command:
+    - sh
+    - -c
+    - |
+      # Пытаемся скачать страницу с example.com, если не удаётся – создаём свою
+      wget -O /init/index.html https://example.com 2>/dev/null || \
+        echo "<html><body><h1>Hello from homework</h1></body></html>" > /init/index.html
+      echo "File created successfully"
+      ls -la /init/   # вывод информации о созданном файле для проверки
+    volumeMounts:
+    - name: shared-volume
+      mountPath: /init   # сохраняем файл в общий том
+  
+  # Основной контейнер – веб-сервер nginx
+  containers:
+  - name: web-server
+    image: nginx:alpine
+    volumeMounts:
+    - name: shared-volume
+      mountPath: /homework   # монтируем общий том в /homework, где лежит index.html
+    lifecycle:
+      preStop:
+        exec:
+          command:
+          - sh
+          - -c
+          - rm -f /homework/index.html   # перед остановкой удаляем файл
+    ports:
+    - containerPort: 80      # стандартный порт nginx, исправлено с 8000 на 80
+      protocol: TCP
+  
+  restartPolicy: Never   # под не будет перезапускаться после завершения

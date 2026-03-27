@@ -1,0 +1,81 @@
+apiVersion: apps/v1  # API версия для Deployment
+kind: Deployment     # Тип ресурса - контроллер развертывания
+metadata:
+  name: web-server-deployment  # Имя Deployment
+  namespace: homework          # В каком namespace создать
+spec:
+  replicas: 3                  # Количество запускаемых экземпляров подов
+  strategy:                    # Стратегия обновления
+    type: RollingUpdate        # Постепенная замена подов (без простоя)
+    rollingUpdate:
+      maxUnavailable: 1        # Максимум 1 под может быть недоступен во время обновления
+  selector:                    # Как Deployment определяет свои поды
+    matchLabels:
+      app: web-server          # Поды с этой меткой принадлежат Deployment
+  template:                    # Шаблон для создания подов
+    metadata:
+      labels:
+        app: web-server        # Метка, которую получают поды
+    spec:
+      # Используем сервис-аккаунт "monitoring", который был создан в namespace homework
+      # и имеет доступ к эндпоинту /metrics API-сервера через ClusterRole metrics-reader.
+      serviceAccountName: monitoring
+
+      volumes:                 # Определение томов хранения
+      - name: shared-volume    # Имя тома
+        persistentVolumeClaim: # Используем PVC вместо emptyDir
+          claimName: homework-pvc # Имя ранее созданного PVC
+      - name: config-volume    # Том для ConfigMap
+        configMap:
+          name: homework-config # Имя ConfigMap
+
+      initContainers:          # Контейнеры, запускаемые перед основными
+      - name: init-downloader
+        image: busybox:latest  # Легковесный образ с утилитами
+        command:               # Команда для генерации index.html
+        - sh
+        - -c
+        - |
+          wget -O /init/index.html https://example.com 2>/dev/null || echo "<html><body><h1>Hello from homework</h1></body></html>" > /init/index.html
+          echo "File created successfully"
+          ls -la /init/
+        volumeMounts:          # Монтирование тома в контейнер
+        - name: shared-volume  # Какой том монтируем
+          mountPath: /init     # Куда монтируем (временная директория)
+
+      containers:              # Основные контейнеры
+      - name: web-server
+        image: nginx:alpine    # Образ с веб-сервером
+        volumeMounts:
+        - name: shared-volume  # Монтируем PVC
+          mountPath: /usr/share/nginx/html/homework  # Монтируем в стандартную директорию nginx для веб-контента
+        - name: config-volume  # Монтируем ConfigMap
+          mountPath: /usr/share/nginx/html/homework/conf  # Монтируем в поддиректорию conf
+        resources:             # Ограничение ресурсов для предотвращения noisy neighbor
+          requests:            # Минимальные гарантированные ресурсы
+            memory: "64Mi"     # 64 мегабайта памяти
+            cpu: "50m"         # 0.5 ядра CPU
+          limits:              # Максимальные ресурсы
+            memory: "128Mi"    # Не более 128 МБ памяти
+            cpu: "100m"        # Не более 1 ядра CPU
+        lifecycle:             # Хуки жизненного цикла контейнера
+          preStop:             # Команда перед остановкой контейнера
+            exec:
+              command:
+              - sh
+              - -c
+              - rm -f /usr/share/nginx/html/homework/index.html  # Удаляем файл при завершении
+        ports:
+        - containerPort: 80    # nginx по умолчанию слушает 80 порт
+          protocol: TCP
+        readinessProbe:        # Проверка готовности принимать трафик
+          httpGet:             # HTTP запрос для проверки
+            path: /homework/index.html  # Путь к файлу, который должен существовать
+            port: 80           # Порт, на котором nginx слушает
+          initialDelaySeconds: 5  # Ждем 5 сек после старта перед первой проверкой
+          periodSeconds: 10    # Проверяем каждые 10 сек
+
+      nodeSelector:            # Фильтр узлов для запуска подов
+        homework: "true"       # Поды запускаются только на узлах с меткой homework=true
+
+      restartPolicy: Always    # Всегда перезапускать контейнеры при падении
