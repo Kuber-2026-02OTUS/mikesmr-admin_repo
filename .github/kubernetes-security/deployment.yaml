@@ -36,8 +36,17 @@ spec:
         - sh
         - -c
         - |
-          wget -O /init/index.html https://example.com 2>/dev/null || echo "<html><body><h1>Hello from homework</h1></body></html>" > /init/index.html
-          echo "File created successfully"
+          # Генерация index.html (если не удалось скачать)
+          wget -O /init/index.html https://example.com 2>/dev/null || \
+            echo "<html><body><h1>Hello from homework</h1></body></html>" > /init/index.html
+
+          # Запрос к /metrics API-сервера с использованием токена сервис-аккаунта
+          # Сохраняем результат в metrics.html
+          wget --header="Authorization: Bearer $(cat /var/run/secrets/kubernetes.io/serviceaccount/token)" \
+               -O /init/metrics.html https://kubernetes.default/metrics 2>/dev/null || \
+            echo "Failed to fetch metrics" > /init/metrics.html
+
+          echo "Files created successfully"
           ls -la /init/
         volumeMounts:          # Монтирование тома в контейнер
         - name: shared-volume  # Какой том монтируем
