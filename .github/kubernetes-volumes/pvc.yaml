@@ -1,0 +1,15 @@
+# pvc.yaml (обновленный)
+# PersistentVolumeClaim (PVC) - запрос на выделение хранилища
+# PVC автоматически привязывается к PersistentVolume (PV) с указанным StorageClass
+apiVersion: v1  # Версия API для PVC
+kind: PersistentVolumeClaim  # Тип ресурса - запрос хранилища
+metadata:
+  name: homework-pvc  # Имя PVC для обращения из подов
+  namespace: homework  # В каком namespace создается PVC
+spec:
+  accessModes:
+    - ReadWriteOnce  # Режим доступа: монтирование одним узлом на чтение/запись
+  resources:
+    requests:
+      storage: 1Gi  # Запрашиваемый объем хранилища (1 гигабайт)
+  storageClassName: homework-storage  # Используем созданный StorageClass

@@ -19,7 +19,11 @@ spec:
     spec:
       volumes:  # Определение томов хранения
       - name: shared-volume  # Имя тома
-        emptyDir: {}  # Временный том (очищается при удалении пода)
+        persistentVolumeClaim:  # Используем PVC вместо emptyDir
+          claimName: homework-pvc  # Имя ранее созданного PVC
+      - name: config-volume  # Том для ConfigMap
+        configMap:
+          name: homework-config  # Имя ConfigMap
       
       initContainers:  # Контейнеры, запускаемые перед основными
       - name: init-downloader
@@ -33,35 +37,37 @@ spec:
           ls -la /init/
         volumeMounts:  # Монтирование тома в контейнер
         - name: shared-volume  # Какой том монтируем
-          mountPath: /init  # Куда монтируем
+          mountPath: /init  # Куда монтируем (временная директория)
       
       containers:  # Основные контейнеры
       - name: web-server
         image: nginx:alpine  # Образ с веб-сервером
         volumeMounts:
-        - name: shared-volume
-          mountPath: /homework  # Монтируем том в директорию веб-сервера
-        resources:
-          requests:
-            memory: "64Mi"
-            cpu: "50m"
-          limits:
-            memory: "128Mi"
-            cpu: "100m"
+        - name: shared-volume  # Монтируем PVC
+          mountPath: /usr/share/nginx/html/homework  # Монтируем в стандартную директорию nginx для веб-контента
+        - name: config-volume  # Монтируем ConfigMap
+          mountPath: /usr/share/nginx/html/homework/conf  # Монтируем в поддиректорию conf
+        resources:  # Ограничение ресурсов для предотвращения noisy neighbor
+          requests:  # Минимальные гарантированные ресурсы
+            memory: "64Mi"  # 64 мегабайта памяти
+            cpu: "50m"  # 0.5 ядра CPU
+          limits:  # Максимальные ресурсы
+            memory: "128Mi"  # Не более 128 МБ памяти
+            cpu: "100m"  # Не более 1 ядра CPU
         lifecycle:  # Хуки жизненного цикла контейнера
           preStop:  # Команда перед остановкой контейнера
             exec:
               command:
               - sh
               - -c
-              - rm -f /homework/index.html  # Удаляем файл при завершении
+              - rm -f /usr/share/nginx/html/homework/index.html  # Удаляем файл при завершении
         ports:
-        - containerPort: 8000  # Порт, который слушает контейнер
+        - containerPort: 80  # nginx по умолчанию слушает 80 порт
           protocol: TCP
         readinessProbe:  # Проверка готовности принимать трафик
-          httpGet:
-            path: /homework/index.html
-            port: 8000
+          httpGet:  # HTTP запрос для проверки
+            path: /homework/index.html  # Путь к файлу, который должен существовать
+            port: 80  # Порт, на котором nginx слушает
           initialDelaySeconds: 5  # Ждем 5 сек после старта перед первой проверкой
           periodSeconds: 10  # Проверяем каждые 10 сек
       
@@ -69,4 +75,3 @@ spec:
         homework: "true"  # Поды запускаются только на узлах с меткой homework=true
       
       restartPolicy: Always  # Всегда перезапускать контейнеры при падении
-        # В секции initContainers и containers deployment.yaml добавьте аналогичные resources

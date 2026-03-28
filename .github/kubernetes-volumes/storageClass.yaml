@@ -1,0 +1,9 @@
+# storageClass.yaml
+# StorageClass - определяет тип хранилища и политики управления им
+# Используется для динамического provisioning PV при создании PVC
+apiVersion: storage.k8s.io/v1  # Версия API для StorageClass
+kind: StorageClass  # Тип ресурса - класс хранения
+metadata:
+  name: homework-storage  # Имя StorageClass для использования в PVC
+provisioner: k8s.io/minikube-hostpath  # Провайдер хранилища (для minikube)
+reclaimPolicy: Retain  # Политика удаления: сохранять PV после удаления PVC

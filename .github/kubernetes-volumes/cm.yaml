@@ -1,0 +1,21 @@
+# cm.yaml
+# ConfigMap - хранилище конфигурационных данных в формате ключ-значение
+# Используется для передачи конфигурации в контейнеры без пересборки образа
+apiVersion: v1  # Версия API для ConfigMap
+kind: ConfigMap  # Тип ресурса - карта конфигурации
+metadata:
+  name: homework-config  # Имя ConfigMap для использования в подах
+  namespace: homework  # В каком namespace создается ConfigMap
+data:
+  # Многострочное значение - файл конфигурации
+  app.properties: |
+    app.name=homework
+    app.version=1.0
+    environment=development
+  
+  # Отдельные пары ключ-значение
+  database.url: "postgresql://localhost:5432/homework"
+  database.user: "homework_user"
+  features.enabled: "true"
+  max.connections: "100"
+  log.level: "info"
