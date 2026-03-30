@@ -3,13 +3,20 @@ releases:
     namespace: prod
     createNamespace: true
     chart: oci://registry-1.docker.io/bitnamicharts/kafka
-    version: 27.0.0                      # версия Helm-чарта
+    version: 27.0.0
     values:
       - replicaCount: 5
         controller:
-          replicaCount: 5                # режим KRaft: каждый брокер = контроллер
+          replicaCount: 5
+          resources:
+            requests:
+              memory: "512Mi"
+              cpu: "250m"
+            limits:
+              memory: "1Gi"
+              cpu: "500m"
         image:
-          tag: 3.5.2-debian-12-r6        # актуальный тег для версии 3.5.2 (проверьте на Docker Hub)
+          tag: 3.5.2-debian-12-r6
         listeners:
           client:
             protocol: SASL_PLAINTEXT
@@ -20,7 +27,7 @@ releases:
           mechanisms: scram-sha-512
           client:
             users: [admin]
-            passwords: [admin123]       # ⚠️ замените на секреты в production
+            passwords: [admin123]
           interbroker:
             user: interbroker
             password: interpass
@@ -30,7 +37,7 @@ releases:
           enabled: true
           size: 10Gi
         volumePermissions:
-          enabled: false                 # отключаем init-контейнер для прав, если не нужен
+          enabled: false
         rbac:
           create: false
         resources:
@@ -40,14 +47,6 @@ releases:
           limits:
             memory: "1Gi"
             cpu: "500m"
-        controller:
-          resources:
-            requests:
-              memory: "512Mi"
-              cpu: "250m"
-            limits:
-              memory: "1Gi"
-              cpu: "500m"
 
   - name: kafka-dev
     namespace: dev
@@ -58,8 +57,15 @@ releases:
       - replicaCount: 1
         controller:
           replicaCount: 1
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "100m"
+            limits:
+              memory: "512Mi"
+              cpu: "200m"
         image:
-          tag: 3.7.0-debian-12-r3        # актуальный тег для последней стабильной версии 3.7.0
+          tag: 3.7.0-debian-12-r3
         listeners:
           client:
             protocol: PLAINTEXT
@@ -82,11 +88,3 @@ releases:
           limits:
             memory: "512Mi"
             cpu: "200m"
-        controller:
-          resources:
-            requests:
-              memory: "256Mi"
-              cpu: "100m"
-            limits:
-              memory: "512Mi"
-              cpu: "200m"
