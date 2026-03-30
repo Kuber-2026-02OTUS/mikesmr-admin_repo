@@ -6,8 +6,10 @@ releases:
     version: 27.0.0                # версия Helm-чарта (проверьте актуальность)
     values:
       - replicaCount: 5
+        controller:
+          replicaCount: 5                # чтобы каждый брокер был контроллером в KRaft
         image:
-          tag: 3.5.2                # фиксированная версия Kafka
+          tag: 3.5.2-debian-12-r0        # фиксированный тег для стабильности
         listeners:
           client:
             protocol: SASL_PLAINTEXT
@@ -46,6 +48,10 @@ releases:
     version: 27.0.0                # та же версия чарта, но образ Kafka будет последний стабильный
     values:
       - replicaCount: 1
+        controller:
+          replicaCount: 1                # один узел-контроллер и брокер
+        image:
+          tag: 3.5.2-debian-12-r0        # явный тег для гарантии
         listeners:
           client:
             protocol: PLAINTEXT
