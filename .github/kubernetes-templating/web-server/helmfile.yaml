@@ -3,13 +3,13 @@ releases:
     namespace: prod
     createNamespace: true
     chart: oci://registry-1.docker.io/bitnamicharts/kafka
-    version: 27.0.0                # версия Helm-чарта (проверьте актуальность)
+    version: 27.0.0                      # версия Helm-чарта
     values:
       - replicaCount: 5
         controller:
-          replicaCount: 5                # чтобы каждый брокер был контроллером в KRaft
+          replicaCount: 5                # режим KRaft: каждый брокер = контроллер
         image:
-          tag: 3.5.2-debian-12-r0        # фиксированный тег для стабильности
+          tag: 3.5.2-debian-12-r6        # актуальный тег для версии 3.5.2 (проверьте на Docker Hub)
         listeners:
           client:
             protocol: SASL_PLAINTEXT
@@ -19,18 +19,20 @@ releases:
           enabled: true
           mechanisms: scram-sha-512
           client:
-            users:
-              - admin
-            passwords:
-              - admin123            # ⚠️ в реальности используйте секреты
+            users: [admin]
+            passwords: [admin123]       # ⚠️ замените на секреты в production
           interbroker:
             user: interbroker
-            password: interpass     # ⚠️ в реальности используйте секреты
+            password: interpass
         authorization:
           enabled: false
         persistence:
           enabled: true
           size: 10Gi
+        volumePermissions:
+          enabled: false                 # отключаем init-контейнер для прав, если не нужен
+        rbac:
+          create: false
         resources:
           requests:
             memory: "512Mi"
@@ -38,20 +40,26 @@ releases:
           limits:
             memory: "1Gi"
             cpu: "500m"
-        rbac:
-          create: false
+        controller:
+          resources:
+            requests:
+              memory: "512Mi"
+              cpu: "250m"
+            limits:
+              memory: "1Gi"
+              cpu: "500m"
 
   - name: kafka-dev
     namespace: dev
     createNamespace: true
     chart: oci://registry-1.docker.io/bitnamicharts/kafka
-    version: 27.0.0                # та же версия чарта, но образ Kafka будет последний стабильный
+    version: 27.0.0
     values:
       - replicaCount: 1
         controller:
-          replicaCount: 1                # один узел-контроллер и брокер
+          replicaCount: 1
         image:
-          tag: 3.5.2-debian-12-r0        # явный тег для гарантии
+          tag: 3.7.0-debian-12-r3        # актуальный тег для последней стабильной версии 3.7.0
         listeners:
           client:
             protocol: PLAINTEXT
@@ -63,6 +71,10 @@ releases:
           enabled: false
         persistence:
           enabled: false
+        volumePermissions:
+          enabled: false
+        rbac:
+          create: false
         resources:
           requests:
             memory: "256Mi"
@@ -70,5 +82,11 @@ releases:
           limits:
             memory: "512Mi"
             cpu: "200m"
-        rbac:
-          create: false
+        controller:
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "100m"
+            limits:
+              memory: "512Mi"
+              cpu: "200m"
