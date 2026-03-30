@@ -15,7 +15,10 @@ releases:
             limits:
               memory: "1Gi"
               cpu: "500m"
-        # Не указываем image.tag, чтобы чарт использовал свой дефолтный (актуальный)
+        image:
+          registry: docker.io
+          repository: bitnamilegacy/kafka
+          tag: 3.3.2
         listeners:
           client:
             protocol: SASL_PLAINTEXT
@@ -63,7 +66,10 @@ releases:
             limits:
               memory: "512Mi"
               cpu: "200m"
-        # Не указываем image.tag, чтобы чарт использовал свой дефолтный (актуальный)
+        image:
+          registry: docker.io
+          repository: bitnamilegacy/kafka
+          tag: 4.0.0-debian-12-r10
         listeners:
           client:
             protocol: PLAINTEXT
