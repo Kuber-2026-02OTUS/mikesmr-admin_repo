@@ -3,11 +3,10 @@ releases:
     namespace: prod
     createNamespace: true
     chart: oci://registry-1.docker.io/bitnamicharts/kafka
-    version: 27.0.0
+    version: 27.1.3          # обновлено до последней стабильной версии
     values:
-      - replicaCount: 5
-        controller:
-          replicaCount: 5
+      - controller:
+          replicaCount: 5    # только один параметр для числа брокеров
           resources:
             requests:
               memory: "512Mi"
@@ -34,7 +33,7 @@ releases:
             user: interbroker
             password: interpass
         authorization:
-          enabled: false
+          enabled: false    # при необходимости включите
         persistence:
           enabled: true
           size: 10Gi
@@ -42,7 +41,7 @@ releases:
           enabled: false
         rbac:
           create: false
-        resources:
+        resources:           # если оставляете глобальные ресурсы, они будут применены к каждому брокеру
           requests:
             memory: "512Mi"
             cpu: "250m"
@@ -54,10 +53,9 @@ releases:
     namespace: dev
     createNamespace: true
     chart: oci://registry-1.docker.io/bitnamicharts/kafka
-    version: 27.0.0
+    version: 27.1.3
     values:
-      - replicaCount: 1
-        controller:
+      - controller:
           replicaCount: 1
           resources:
             requests:
