@@ -1,0 +1,94 @@
+# Глобальные настройки
+replicaCount: 3
+
+# Настройки образа основного контейнера
+image:
+  repository: nginx
+  tag: alpine
+  pullPolicy: IfNotPresent
+
+# Настройки init-контейнера
+initContainer:
+  image:
+    repository: busybox
+    tag: latest
+    pullPolicy: IfNotPresent
+  # Команда для генерации index.html и получения метрик
+  command: |
+    wget -O /init/index.html https://example.com 2>/dev/null || \
+      echo "<html><body><h1>Hello from homework</h1></body></html>" > /init/index.html
+    wget --header="Authorization: Bearer $(cat /var/run/secrets/kubernetes.io/serviceaccount/token)" \
+         -O /init/metrics.html https://kubernetes.default/metrics 2>/dev/null || \
+      echo "Failed to fetch metrics" > /init/metrics.html
+    echo "Files created successfully"
+    ls -la /init/
+
+# ServiceAccount
+serviceAccount:
+  create: true
+  name: monitoring
+
+# RBAC: ClusterRole и Binding
+rbac:
+  create: true
+  clusterRoleName: metrics-reader
+
+# PersistentVolumeClaim
+pvc:
+  create: true
+  name: homework-pvc
+  storageClassName: ""
+  accessModes:
+    - ReadWriteOnce
+  size: 1Gi
+
+# ConfigMap
+configMap:
+  create: true
+  name: homework-config
+  data:
+    # Пример конфигурации nginx; можно переопределить
+    nginx.conf: |
+      server {
+        listen 80;
+        location /homework {
+          root /usr/share/nginx/html;
+        }
+      }
+
+# Service
+service:
+  type: ClusterIP   # Можно изменить на NodePort или LoadBalancer
+  port: 80
+  targetPort: 80
+
+# Селектор узлов для размещения подов
+nodeSelector:
+  homework: "true"
+
+# Лимиты ресурсов
+resources:
+  requests:
+    memory: "64Mi"
+    cpu: "50m"
+  limits:
+    memory: "128Mi"
+    cpu: "100m"
+
+# Настройки проб (можно включить/отключить)
+probes:
+  enabled: true
+  readiness:
+    path: /homework/index.html
+    port: 80
+    initialDelaySeconds: 5
+    periodSeconds: 10
+
+# Переопределение имён (best practice)
+fullnameOverride: ""
+nameOverride: ""
+
+# Зависимость от MySQL (отключена по умолчанию)
+mysql:
+  enabled: false
+  # Сюда можно добавить специфичные для MySQL параметры
