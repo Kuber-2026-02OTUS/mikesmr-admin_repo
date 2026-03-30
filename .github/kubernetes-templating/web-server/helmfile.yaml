@@ -1,0 +1,73 @@
+repositories:
+  - name: bitnami
+    url: https://charts.bitnami.com/bitnami
+
+releases:
+  - name: kafka-prod
+    namespace: prod
+    createNamespace: true
+    chart: bitnami/kafka
+    version: 27.0.0                # Версия Helm-чарта
+    values:
+      - replicaCount: 5
+        image:
+          tag: 3.5.2                # Фиксированная версия Kafka
+        listeners:
+          client:
+            protocol: SASL_PLAINTEXT
+          interbroker:
+            protocol: SASL_PLAINTEXT
+        sasl:
+          enabled: true
+          mechanisms: scram-sha-512
+          client:
+            users:
+              - admin
+            passwords:
+              - admin123            # ⚠️ В реальности будем использовать секреты
+          interbroker:
+            user: interbroker
+            password: interpass     # ⚠️ В реальности будем использовать секреты
+        authorization:
+          enabled: false            # SASL_PLAINTEXT не требует ACL, но для простоты отключаем
+        persistence:
+          enabled: true
+          size: 10Gi
+        resources:
+          requests:
+            memory: "512Mi"
+            cpu: "250m"
+          limits:
+            memory: "1Gi"
+            cpu: "500m"
+        # Для удобства отключаем создание RBAC, если не нужно
+        rbac:
+          create: false
+
+  - name: kafka-dev
+    namespace: dev
+    createNamespace: true
+    chart: bitnami/kafka
+    version: 27.0.0                # Та же версия чарта, но с последним образом Kafka
+    values:
+      - replicaCount: 1
+        listeners:
+          client:
+            protocol: PLAINTEXT
+          interbroker:
+            protocol: PLAINTEXT
+        sasl:
+          enabled: false
+        authorization:
+          enabled: false
+        persistence:
+          enabled: false            # Для dev не требуется постоянное хранилище
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "100m"
+          limits:
+            memory: "512Mi"
+            cpu: "200m"
+        rbac:
+          create: false
