@@ -17,7 +17,7 @@ releases:
         image:
           registry: docker.io
           repository: bitnamilegacy/kafka
-          tag: 3.3.2
+          tag: 4.0.0-debian-12-r10   # образ, совместимый с KRaft
         listeners:
           client:
             protocol: SASL_PLAINTEXT
@@ -41,6 +41,7 @@ releases:
           enabled: false
         rbac:
           create: false
+        # KRaft включён по умолчанию, никаких дополнительных опций не требуется
 
   - name: kafka-dev
     namespace: dev
