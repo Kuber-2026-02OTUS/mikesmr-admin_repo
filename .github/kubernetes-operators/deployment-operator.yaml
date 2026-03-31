@@ -1,10 +1,9 @@
 # deployment-operator.yaml
-# Запуск оператора, который будет управлять ресурсами MySQL
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: mysql-operator
-  namespace: homework
+  namespace: homework                # Оператор запускается в homework
 spec:
   replicas: 1
   selector:
@@ -15,12 +14,11 @@ spec:
       labels:
         app: mysql-operator
     spec:
-      serviceAccountName: mysql-operator   # ранее созданный SA
+      serviceAccountName: mysql-operator
       containers:
       - name: operator
         image: roflmaoinmysoul/mysql-operator:1.0.0
         imagePullPolicy: IfNotPresent
-        # при необходимости можно добавить переменные окружения
-        # env:
-        # - name: WATCH_NAMESPACE
-        #   value: ""
+        env:
+        - name: WATCH_NAMESPACE          # Заставляем оператор наблюдать только за homework
+          value: "homework"
