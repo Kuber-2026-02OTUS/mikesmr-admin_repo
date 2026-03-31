@@ -1,9 +1,10 @@
 # deployment-operator.yaml
+# Запуск оператора MySQL в namespace default
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: mysql-operator
-  namespace: homework                # Оператор запускается в homework
+  # namespace: default   # по умолчанию default
 spec:
   replicas: 1
   selector:
@@ -14,11 +15,9 @@ spec:
       labels:
         app: mysql-operator
     spec:
-      serviceAccountName: mysql-operator
+      serviceAccountName: mysql-operator   # используем созданный SA
       containers:
       - name: operator
-        image: roflmaoinmysoul/mysql-operator:1.0.0
+        image: roflmaoinmysoul/mysql-operator:1.0.0   # образ оператора
         imagePullPolicy: IfNotPresent
-        env:
-        - name: WATCH_NAMESPACE          # Заставляем оператор наблюдать только за homework
-          value: "homework"
+        # Не задаём WATCH_NAMESPACE, т.к. образ всё равно жёстко работает с default
