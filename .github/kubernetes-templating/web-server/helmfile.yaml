@@ -1,0 +1,79 @@
+releases:
+  - name: kafka-prod
+    namespace: prod
+    createNamespace: true
+    chart: oci://registry-1.docker.io/bitnamicharts/kafka
+    version: 32.4.3
+    values:
+      - controller:
+          replicaCount: 2
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "100m"
+            limits:
+              memory: "500Mi"
+              cpu: "256m"
+        image:
+          registry: docker.io
+          repository: bitnamilegacy/kafka
+          tag: 4.0.0-debian-12-r10   # образ, совместимый с KRaft
+        listeners:
+          client:
+            protocol: SASL_PLAINTEXT
+          interbroker:
+            protocol: SASL_PLAINTEXT
+        sasl:
+          enabled: true
+          mechanisms: scram-sha-512
+          client:
+            users: [admin]
+            passwords: [admin123]
+          interbroker:
+            user: interbroker
+            password: interpass
+        authorization:
+          enabled: false
+        persistence:
+          enabled: true
+          size: 10Gi
+        volumePermissions:
+          enabled: false
+        rbac:
+          create: false
+        # KRaft включён по умолчанию, никаких дополнительных опций не требуется
+
+  - name: kafka-dev
+    namespace: dev
+    createNamespace: true
+    chart: oci://registry-1.docker.io/bitnamicharts/kafka
+    version: 32.4.3
+    values:
+      - controller:
+          replicaCount: 1
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "100m"
+            limits:
+              memory: "512Mi"
+              cpu: "200m"
+        image:
+          registry: docker.io
+          repository: bitnamilegacy/kafka
+          tag: 4.0.0-debian-12-r10
+        listeners:
+          client:
+            protocol: PLAINTEXT
+          interbroker:
+            protocol: PLAINTEXT
+        sasl:
+          enabled: false
+        authorization:
+          enabled: false
+        persistence:
+          enabled: false
+        volumePermissions:
+          enabled: false
+        rbac:
+          create: false
