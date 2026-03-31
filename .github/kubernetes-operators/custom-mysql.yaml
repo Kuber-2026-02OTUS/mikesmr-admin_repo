@@ -1,0 +1,12 @@
+# custom-mysql.yaml
+# Экземпляр кастомного ресурса MySQL (должен соответствовать CRD)
+apiVersion: otus.homework/v1
+kind: MySQL
+metadata:
+  name: my-mysql-instance
+  namespace: homework
+spec:
+  image: mysql:8.0               # Docker-образ MySQL
+  database: mydb                 # имя базы данных
+  password: strongpassword       # пароль
+  storage_size: 10Gi             # размер хранилища (должен быть строкой)
