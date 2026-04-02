@@ -35,5 +35,5 @@ spec:
                 type: string
               storage_size:
                 type: string
-        required:
-        - spec
+            required:
+            - spec
