@@ -1,0 +1,11 @@
+# Dockerfile
+FROM nginx:latest
+
+# Удаляем дефолтную конфигурацию
+RUN rm /etc/nginx/conf.d/default.conf
+
+# Копируем нашу конфигурацию
+COPY nginx.conf /etc/nginx/conf.d/
+
+# Опционально: создаем простую HTML-страницу
+RUN echo "Hello from custom Nginx!" > /usr/share/nginx/html/index.html
