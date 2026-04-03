@@ -1,0 +1,12 @@
+# custom-mysql.yaml
+# Экземпляр кастомного ресурса MySQL, который будет обработан оператором
+apiVersion: otus.homework/v1
+kind: MySQL
+metadata:
+  name: my-mysql-instance
+  # namespace: default   # по умолчанию default
+spec:
+  image: mysql:8.0               # образ базы данных
+  database: mydb                 # имя создаваемой БД
+  password: strongpassword       # пароль для БД
+  storage_size: 10Gi             # размер хранилища (строка)

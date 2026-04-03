@@ -5,7 +5,7 @@
 SSH: ssh-key-1774100800420
 строка подключения: 
 ssh -l mike 
-ssh -i "C:\Users\AntApart\.ssh\ssh-key-1774100800420" mike@62.84.120.177
+w
 
 yc compute ssh \ --id epdneb77r7p31vrst026 \ --identity-file "C:\Users\AntApart\.ssh\ssh-key-1774100800420" \ --login mike
 
@@ -15,3 +15,5 @@ curl -LO https://dl.k8s.io/release/v1.38.1/bin/linux/amd64/kubectl
 
 curl -LO https://github.com/kubernetes/minikube/releases/latest/download/minikube-linux-amd64
 sudo install minikube-linux-amd64 /usr/local/bin/minikube && rm minikube-linux-amd64
+
+ssh -i "C:\Users\AntApart\.ssh\ssh-key-1774100800420" mike@158.160.22.104
