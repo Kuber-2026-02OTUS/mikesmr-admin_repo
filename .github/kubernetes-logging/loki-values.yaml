@@ -1,0 +1,45 @@
+# Отключаем авторизацию, как требуется в задании
+auth_enabled: false
+
+# Конфигурация для хранения логов в S3
+storage:
+  type: s3
+  s3:
+    endpoint: storage.yandexcloud.net
+    region: ru-central-1
+    bucketnames: my-logs-bucket-20260404
+    access_key_id: "ajekgfnmsqij8m6ienj5"
+    secret_access_key: "YCP3wWAZWtsCQUa2nyscNJu78sQ8QLzAJEiUuQSo"
+
+# Основная конфигурация Loki
+loki:
+  schemaConfig:
+    configs:
+    - from: 2024-01-01
+      store: boltdb-shipper
+      object_store: s3
+      schema: v13
+      index:
+        prefix: loki_index_
+        period: 24h
+  storageConfig:
+    boltdb_shipper:
+      shared_store: s3
+    aws:
+      s3: s3://storage.yandexcloud.net/my-logs-bucket-20260404
+
+# Конфигурация Promtail для сбора логов
+promtail:
+  enabled: true
+  serviceMonitor:
+    enabled: false
+
+# Настройка для размещения на infra-нодах
+tolerations:
+  - key: "node-role"
+    operator: "Equal"
+    value: "infra"
+    effect: "NoSchedule"
+
+nodeSelector:
+  node-role: infra

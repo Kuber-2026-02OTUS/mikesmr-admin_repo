@@ -1,0 +1,4 @@
+mike@demo-otus-k8s:~$ kubectl get nodes -o custom-columns=NAME:.metadata.name,TAINTS:.spec.taints
+NAME                        TAINTS
+cl1bfr5kv89o03uc017a-uwek   [map[effect:NoSchedule key:node-role value:infra]]
+cl1lbtosrm09odogdsod-izut   <none>
