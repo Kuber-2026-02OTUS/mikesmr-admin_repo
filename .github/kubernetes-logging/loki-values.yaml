@@ -9,7 +9,7 @@ storage:
     region: ru-central-1
     bucketnames: my-logs-bucket-20260404
     access_key_id: "ajekgfnmsqij8m6ienj5"
-    secret_access_key: "YCP3wWAZWtsCQUa2nyscNJu78sQ8QLzAJEiUuQSo"
+    secret_access_key: ""
 
 # Основная конфигурация Loki
 loki:
