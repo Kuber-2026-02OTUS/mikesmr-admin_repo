@@ -1,40 +1,81 @@
-# Отключаем авторизацию, как требуется в задании
+deploymentMode: SingleBinary
 auth_enabled: false
 
-# Конфигурация для хранения логов в S3
-storage:
-  type: s3
-  s3:
-    endpoint: storage.yandexcloud.net
-    region: ru-central-1
-    bucketnames: my-logs-bucket-20260404
-    access_key_id: "ajekgfnmsqij8m6ienj5"
-    secret_access_key: ""
+# Отключаем тесты
+test:
+  enabled: false
 
-# Основная конфигурация Loki
+# Включаем canary (требование чарта), но с минимальными ресурсами
+lokiCanary:
+  enabled: true
+  image:
+    repository: cr.yandex/crpcdfo4fubpcdm8nbqq/loki-canary
+    tag: 2.9.2
+    pullPolicy: IfNotPresent
+    pullSecrets:
+      - cr-secret
+  resources:
+    requests:
+      memory: 64Mi
+      cpu: 50m
+    limits:
+      memory: 128Mi
+      cpu: 100m
+
+# Отключаем ненужные компоненты
+gateway:
+  enabled: false
+chunksCache:
+  enabled: false
+resultsCache:
+  enabled: false
+
+# Кастомные образы из вашего registry
+image:
+  repository: cr.yandex/crpcdfo4fubpcdm8nbqq/loki
+  tag: 2.9.2
+  pullPolicy: IfNotPresent
+  pullSecrets:
+    - cr-secret
+
+promtail:
+  enabled: true
+  image:
+    repository: cr.yandex/crpcdfo4fubpcdm8nbqq/promtail
+    tag: 2.9.2
+    pullPolicy: IfNotPresent
+    pullSecrets:
+      - cr-secret
+
+# Конфигурация Loki
 loki:
+  storage:
+    type: s3
+    bucketNames:
+      chunks: my-logs-bucket-20260404
+      ruler: my-logs-bucket-20260404
+    s3:
+      endpoint: storage.yandexcloud.net
+      region: ru-central-1
+      accessKeyId: "YCAJE_30JOXCZCYhW_sx9peZU"        # замените
+      secretAccessKey: ""    # замените
+      s3ForcePathStyle: false
   schemaConfig:
     configs:
     - from: 2024-01-01
-      store: boltdb-shipper
+      store: tsdb
       object_store: s3
       schema: v13
       index:
         prefix: loki_index_
         period: 24h
   storageConfig:
-    boltdb_shipper:
+    tsdb_shipper:
+      active_index_directory: /var/loki/index
+      cache_location: /var/loki/index_cache
       shared_store: s3
-    aws:
-      s3: s3://storage.yandexcloud.net/my-logs-bucket-20260404
 
-# Конфигурация Promtail для сбора логов
-promtail:
-  enabled: true
-  serviceMonitor:
-    enabled: false
-
-# Настройка для размещения на infra-нодах
+# Размещение на infra-нодах
 tolerations:
   - key: "node-role"
     operator: "Equal"
