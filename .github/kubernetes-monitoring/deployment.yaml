@@ -1,0 +1,33 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-metrics-deployment
+  namespace: homework
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: nginx-metrics
+  template:
+    metadata:
+      labels:
+        app: nginx-metrics
+    spec:
+      containers:
+      # --- Ваш существующий контейнер с NGINX ---
+      - name: nginx
+        image: custom-nginx-metrics:latest
+        imagePullPolicy: Never
+        ports:
+        - containerPort: 80
+          name: http # Добавим имя для порта
+
+      # --- Новый sidecar-контейнер с Prometheus Exporter ---
+      - name: nginx-exporter
+        image: nginx/nginx-prometheus-exporter:0.11.0
+        args:
+          # Указываем exporter'у, где забирать метрики
+           - -nginx.scrape-uri=http://localhost/metrics
+        ports:
+        - containerPort: 9113
+          name: metrics # Порт, который будет сканировать Prometheus

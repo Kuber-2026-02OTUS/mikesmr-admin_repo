@@ -1,0 +1,23 @@
+# deployment-operator.yaml
+# Запуск оператора MySQL в namespace default
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: mysql-operator
+  # namespace: default   # по умолчанию default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: mysql-operator
+  template:
+    metadata:
+      labels:
+        app: mysql-operator
+    spec:
+      serviceAccountName: mysql-operator   # используем созданный SA
+      containers:
+      - name: operator
+        image: roflmaoinmysoul/mysql-operator:1.0.0   # образ оператора
+        imagePullPolicy: IfNotPresent
+        # Не задаём WATCH_NAMESPACE, т.к. образ всё равно жёстко работает с default

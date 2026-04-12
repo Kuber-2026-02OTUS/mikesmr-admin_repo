@@ -1,0 +1,16 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: nginx-metrics-monitor
+  namespace: homework
+spec:
+  selector:
+    matchLabels:
+      app: nginx-metrics # Этот label должен совпадать с labels сервиса
+  endpoints:
+  - port: metrics # Имя порта из Service
+    path: /metrics  # Путь, по которому exporter отдает метрики
+    interval: 30s
+  namespaceSelector:
+    matchNames:
+    - homework

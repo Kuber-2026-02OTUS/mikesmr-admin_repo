@@ -1,0 +1,31 @@
+# rbac.yaml
+# Сервисный аккаунт для оператора (в namespace default)
+apiVersion: v1
+kind: ServiceAccount
+metadata:
+  name: mysql-operator
+  # namespace: default   # по умолчанию default
+---
+# ClusterRole с полными правами на все ресурсы API
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRole
+metadata:
+  name: mysql-operator-full-access
+rules:
+- apiGroups: ["*"]        # все группы API
+  resources: ["*"]        # все типы ресурсов
+  verbs: ["*"]            # все действия (get, list, create, delete, ...)
+---
+# Привязка ClusterRole к ServiceAccount в namespace default
+apiVersion: rbac.authorization.k8s.io/v1
+kind: ClusterRoleBinding
+metadata:
+  name: mysql-operator-binding
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: ClusterRole
+  name: mysql-operator-full-access
+subjects:
+- kind: ServiceAccount
+  name: mysql-operator
+  namespace: default      # SA находится в default
