@@ -1,0 +1,7 @@
+helm pull oci://cr.yandex/yc-marketplace/yandex-cloud/argo/chart/argo-cd \
+  --version 7.3.11-2 \
+  --untar && \
+helm install \
+  --namespace <argo-cd-space> \
+  --create-namespace \
+  argo-cd ./argo-cd/

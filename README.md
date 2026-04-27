@@ -5,7 +5,7 @@
 SSH: ssh-key-1774100800420
 строка подключения: 
 ssh -l mike 
-ssh -i "C:\Users\AntApart\.ssh\ssh-key-1774100800420" mike@111.88.241.109
+ssh -i "C:\Users\AntApart\.ssh\ssh-key-1774100800420" mike@111.88.247.58
 
 yc compute ssh \ --id epdneb77r7p31vrst026 \ --identity-file "C:\Users\AntApart\.ssh\ssh-key-1774100800420" \ --login mike
 
