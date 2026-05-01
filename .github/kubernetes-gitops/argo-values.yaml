@@ -1,0 +1,9 @@
+# argo-values.yaml
+global:
+  tolerations:
+    - key: "node-role"
+      operator: "Equal"
+      value: "infra"
+      effect: "NoSchedule"
+  nodeSelector:
+    node-role: infra
