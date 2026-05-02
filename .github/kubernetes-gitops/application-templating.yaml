@@ -8,7 +8,7 @@ metadata:
 spec:
   project: otus
   source:
-    repoURL: git@github.com:Kuber-2026-02OTUS/mikesmr-admin_repo.git
+    repoURL: https://github.com/Kuber-2026-02OTUS/mikesmr-admin_repo.git
     targetRevision: kubernetes-gitops   # <-- ваша рабочая ветка
     path: .github/kubernetes-templating/web-server
     helm:
