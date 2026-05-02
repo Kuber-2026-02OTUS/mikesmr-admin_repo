@@ -8,7 +8,7 @@ metadata:
 spec:
   project: otus
   source:
-    repoURL: https://github.com/Kuber-2026-02OTUS/mikesmr-admin_repo.git   # <-- HTTPS
+    repoURL: https://github.com/Kuber-2026-02OTUS/mikesmr-admin_repo.git
     targetRevision: kubernetes-gitops
     path: .github/kubernetes-networks
   destination:
