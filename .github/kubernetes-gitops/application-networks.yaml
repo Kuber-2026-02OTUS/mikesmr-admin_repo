@@ -8,13 +8,12 @@ metadata:
 spec:
   project: otus
   source:
-    repoURL: git@github.com:Kuber-2026-02OTUS/mikesmr-admin_repo.git
-    targetRevision: kubernetes-gitops   # <-- ваша рабочая ветка
-    path: kubernetes-networks
+    repoURL: https://github.com/Kuber-2026-02OTUS/mikesmr-admin_repo.git   # <-- HTTPS
+    targetRevision: kubernetes-gitops
+    path: .github/kubernetes-networks
   destination:
     server: https://kubernetes.default.svc
     namespace: homework
   syncPolicy:
     syncOptions:
       - CreateNamespace=true
-    # manual sync – отсутствует секция automated

@@ -1,1 +1,5 @@
 wA94tjKP8RRhjD2i
+
+argocd repo add https://github.com/Kuber-2026-02OTUS/mikesmr-admin_repo.git \
+  --username MikeSMR-admin \
+  --password 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
