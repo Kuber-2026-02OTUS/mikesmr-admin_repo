@@ -19,16 +19,16 @@ spec:
   destination:
     server: https://kubernetes.default.svc
     namespace: homeworkhelm
-  syncPolicy:
-    automated:
-      prune: true
-      selfHeal: true
-      allowEmpty: false
-    syncOptions:
-      - CreateNamespace=true
-    retry:
-      limit: 5
-      backoff:
-        duration: 5s
-        factor: 2
-        maxDuration: 3m
+# syncPolicy:
+#    automated:
+#      prune: true
+#      selfHeal: true
+#      allowEmpty: false
+#    syncOptions:
+#      - CreateNamespace=true
+#    retry:
+#      limit: 5
+#      backoff:
+#        duration: 5s
+#        factor: 2
+#        maxDuration: 3m
