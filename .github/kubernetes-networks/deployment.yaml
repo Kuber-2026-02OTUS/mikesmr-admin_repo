@@ -40,7 +40,7 @@ spec:
         image: nginx:alpine  # Образ с веб-сервером
         volumeMounts:
         - name: shared-volume
-          mountPath: /homework  # Монтируем том в директорию веб-сервера
+          mountPath: /usr/share/nginx/html/homework
         resources:
           requests:
             memory: "64Mi"
