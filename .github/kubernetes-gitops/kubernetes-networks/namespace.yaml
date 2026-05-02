@@ -1,0 +1,9 @@
+# namespace.yaml
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: homework  # Имя namespace для изоляции ресурсов ДЗ
+  labels:
+    name: homework  # Метка для идентификации namespace
+  annotations:
+    description: "Namespace for homework tasks"  # Пояснение для команды
