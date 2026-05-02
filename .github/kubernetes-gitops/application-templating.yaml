@@ -16,7 +16,7 @@ spec:
         replicaCount: 3   # переопределяем количество реплик
   destination:
     server: https://kubernetes.default.svc
-    namespace: HomeworkHelm
+    namespace: homeworkhelm
   syncPolicy:
     automated:
       prune: true
