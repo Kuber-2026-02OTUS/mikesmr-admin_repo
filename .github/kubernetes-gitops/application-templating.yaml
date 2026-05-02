@@ -13,7 +13,9 @@ spec:
     path: .github/kubernetes-templating/web-server
     helm:
       values: |
-        replicaCount: 3   # переопределяем количество реплик
+        replicaCount: 3
+        rbac:
+          create: false
   destination:
     server: https://kubernetes.default.svc
     namespace: homeworkhelm
