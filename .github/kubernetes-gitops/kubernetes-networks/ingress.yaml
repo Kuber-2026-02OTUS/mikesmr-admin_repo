@@ -8,7 +8,6 @@ metadata:
     # Без этой аннотации запрос /homepage будет передан в сервис как /homepage
     # С ней — путь будет изменён согласно capture groups из rewrite-target
     nginx.ingress.kubernetes.io/rewrite-target: /$2
-    argocd.argoproj.io/compare-options: IgnoreExtraneous
 spec:
   ingressClassName: nginx  # Указывает использовать установленный NGINX Ingress Controller
   rules:
