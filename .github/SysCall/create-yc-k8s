@@ -1,0 +1,10 @@
+yc managed-kubernetes cluster create \
+  --folder-id b1gp0pnhs1rr4vvul155 \
+  --network-id enpq9mgpa4t4ncsr5ckl \
+  --service-account-id aje8j86a9k90rrle3b61 \
+  --node-service-account-id ajetmhu4c52096km7cpn \
+  --release-channel STABLE \
+  --version 1.33 \
+  --zone ru-central1-a \
+  --subnet-id e9blbl1kpejjfq3amjos \
+  --public-ip=true
