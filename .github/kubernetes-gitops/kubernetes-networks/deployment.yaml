@@ -40,7 +40,7 @@ spec:
         image: nginx:alpine  # Образ с веб-сервером
         volumeMounts:
         - name: shared-volume
-          mountPath: /usr/share/nginx/html/homework
+          mountPath: /homework  # Монтируем том в директорию веб-сервера
         resources:
           requests:
             memory: "64Mi"
@@ -56,12 +56,12 @@ spec:
               - -c
               - rm -f /homework/index.html  # Удаляем файл при завершении
         ports:
-        - containerPort: 80  # Порт, который слушает контейнер
+        - containerPort: 8000  # Порт, который слушает контейнер
           protocol: TCP
         readinessProbe:  # Проверка готовности принимать трафик
           httpGet:
             path: /homework/index.html
-            port: 80
+            port: 8000
           initialDelaySeconds: 5  # Ждем 5 сек после старта перед первой проверкой
           periodSeconds: 10  # Проверяем каждые 10 сек
       

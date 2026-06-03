@@ -1,0 +1,30 @@
+Спасибо за установку {{ .Chart.Name }}.
+
+Приложение развёрнуто в namespace {{ .Release.Namespace }}.
+
+Доступ к веб-серверу:
+{{- if eq .Values.service.type "ClusterIP" }}
+  1. Получите имя пода:
+     export POD_NAME=$(kubectl get pods --namespace {{ .Release.Namespace }} -l "app.kubernetes.io/name={{ include "my-web-app.name" . }},app.kubernetes.io/instance={{ .Release.Name }}" -o jsonpath="{.items[0].metadata.name}")
+  2. Выполните проброс порта:
+     kubectl --namespace {{ .Release.Namespace }} port-forward $POD_NAME 8080:{{ .Values.service.targetPort }}
+  3. Откройте браузер по адресу http://localhost:8080/homework/index.html
+{{- else if eq .Values.service.type "NodePort" }}
+  1. Получите IP узла и порт:
+     export NODE_IP=$(kubectl get nodes --namespace {{ .Release.Namespace }} -o jsonpath="{.items[0].status.addresses[0].address}")
+     export NODE_PORT=$(kubectl get svc --namespace {{ .Release.Namespace }} {{ include "my-web-app.fullname" . }}-service -o jsonpath="{.spec.ports[0].nodePort}")
+  2. Перейдите по адресу http://$NODE_IP:$NODE_PORT/homework/index.html
+{{- else if eq .Values.service.type "LoadBalancer" }}
+  1. Дождитесь получения внешнего IP:
+     kubectl get svc --namespace {{ .Release.Namespace }} {{ include "my-web-app.fullname" . }}-service -w
+  2. Затем откройте http://<EXTERNAL-IP>:{{ .Values.service.port }}/homework/index.html
+{{- end }}
+
+Дополнительная информация:
+- Приложение использует PVC {{ .Values.pvc.name }} для общего хранилища.
+- ConfigMap {{ .Values.configMap.name }} предоставляет конфигурацию.
+- Сервисный аккаунт {{ .Values.serviceAccount.name }} используется с RBAC для доступа к /metrics.
+- Пробы {{ if .Values.probes.enabled }}включены{{ else }}отключены{{ end }}.
+- {{ if .Values.mysql.enabled }}MySQL развёрнут как зависимость. Используйте `helm list` для просмотра релиза.{{ else }}Зависимость MySQL отключена (установите mysql.enabled=true, чтобы включить).{{ end }}
+
+За дополнительной информацией обращайтесь к документации чарта.

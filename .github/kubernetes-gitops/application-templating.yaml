@@ -1,0 +1,34 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: kubernetes-templating
+  namespace: argocd
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: otus
+  source:
+    repoURL: https://github.com/Kuber-2026-02OTUS/mikesmr-admin_repo.git
+    targetRevision: kubernetes-gitops   # <-- ваша рабочая ветка
+    path: .github/kubernetes-templating/web-server
+    helm:
+      values: |
+        replicaCount: 3
+        rbac:
+          create: false
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: homeworkhelm
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+      allowEmpty: false
+    syncOptions:
+      - CreateNamespace=true
+    retry:
+      limit: 4
+      backoff:
+        duration: 5s
+        factor: 2
+        maxDuration: 3m
