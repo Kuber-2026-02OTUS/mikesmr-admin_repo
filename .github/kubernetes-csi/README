@@ -1,0 +1,27 @@
+mike@demo-otus-k8s:~/github-rep/mikesmr-admin_repo/.github/kubernetes-csi$ yc resource-manager folder list
++----------------------+--------------+--------+--------+
+|          ID          |     NAME     | LABELS | STATUS |
++----------------------+--------------+--------+--------+
+| b1gbqeve5scj66u1qu4h | default      |        | ACTIVE |
+| b1gp0pnhs1rr4vvul155 | homework-dir |        | ACTIVE |
++----------------------+--------------+--------+--------+
+
+mike@demo-otus-k8s:~/github-rep/mikesmr-admin_repo/.github/kubernetes-csi$ yc storage bucket list
++-----------------------+----------------------+------------+-----------------------+---------------------+
+|         NAME          |      FOLDER ID       |  MAX SIZE  | DEFAULT STORAGE CLASS |     CREATED AT      |
++-----------------------+----------------------+------------+-----------------------+---------------------+
+| s3-csi-sa-bucket-otus | b1gp0pnhs1rr4vvul155 | 1073741824 | STANDARD              | 2026-06-01 09:31:33 |
++-----------------------+----------------------+------------+-----------------------+---------------------+
+
+mike@demo-otus-k8s:~/github-rep/mikesmr-admin_repo/.github/kubernetes-csi$ kubectl exec -n kube-system csi-s3-test-nginx -- ls -la /data/
+total 10
+drwxrwxrwx    2 root     root          4096 Jun  1 13:22 .
+drwxr-xr-x    1 root     root          4096 Jun  1 13:09 ..
+-rw-rw-rw-    1 root     root          1260 Jun  1 13:22 test-file.txt
+
+mike@demo-otus-k8s:~/github-rep/mikesmr-admin_repo/.github/kubernetes-csi$ kubectl exec -n kube-system csi-s3-test-nginx -- cat /data/test-file.txt | tail -5
+Mon Jun  1 13:20:47 UTC 2026 - Writing to S3
+Mon Jun  1 13:21:17 UTC 2026 - Writing to S3
+Mon Jun  1 13:21:47 UTC 2026 - Writing to S3
+Mon Jun  1 13:22:17 UTC 2026 - Writing to S3
+Mon Jun  1 13:22:47 UTC 2026 - Writing to S3

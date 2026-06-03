@@ -1,0 +1,20 @@
+yc managed-kubernetes node-group create \
+  --name group-node-yc-k8s \
+  --cluster-id catpmags0p58gv78kprb \
+  --version 1.33 \
+  --platform standard-v4a \
+  --memory 4 \
+  --cores 2 \
+  --core-fraction 100 \
+  --disk-type network-hdd \
+  --disk-size 64 \
+  --network-interface subnets=e9blbl1kpejjfq3amjos,ipv4-address=auto \
+  --container-runtime CONTAINERD \
+  --metadata ssh-keys=otus:ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABAQDZ3bmIxo12wL8G3bFT6bJ0P6VpeTelNKQN6z1hEfaVVTh6qzJvhmoccE0jINL0ijkX0XfGHDIIwTr5yftbWaTTnmEa8BHpLW0+jIYI7fdvnX/MuM4nMgm771LWzQ28/mD0NKQrhVaPI1kXlvzE32DdC2x9N3Xt7ioDj7cJTtQojONVGiSTBJD30IlsWbR47CWmrkACt7qm36eAL8BsKa8mrL6Gh/OlCjGP/6C5fqebCTA+vrNppWwM3tZxR04HMuxYO/tBHIGIBWCiVrAKV+iVrWm48cKjo/OqN1qRqwFoDRdsQVIyQrOxte2NXd9ajZfsbLm4NdnPVBvrKievwjtr otus \
+  --fixed-size 3 \
+  --location zone=ru-central1-a \
+  --auto-upgrade=false \
+  --auto-repair=true \
+  --enable-workload-identity-federation=false \
+  --max-expansion 1 \
+  --max-unavailable 0
